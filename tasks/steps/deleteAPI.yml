@@ -1,0 +1,23 @@
+
+---
+
+- name: Delete the service
+  uri:
+    url: "{{ threescale_admin_route }}/admin/api/services/{{ threescale_created_service_id }}.json"
+    validate_certs: no
+    method: DELETE
+    body: '{{ delete_service_payload }}'
+    status_code: "200"
+  register: delete_service_resp
+  changed_when: 'delete_service_resp.status == 200'
+
+- name: Wait for a couple seconds for route to be deleted by Zync
+  pause:
+    seconds: 10
+
+- name: "Verify API staging url has been deleted from routes"
+  shell: oc get routes -n openshift-3scale | grep {{ threescale_api_name }} | grep apicast-staging | awk '{ print $2 }'
+  register: api_route
+  failed_when:
+  - api_route.rc == 0
+  - api_route.stdout != ''

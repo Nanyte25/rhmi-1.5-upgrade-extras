@@ -1,0 +1,4 @@
+threescale_api_name: testapi1
+
+
+delete_service_payload: '{{ lookup(''template'', ''delete_service.j2'') }}'

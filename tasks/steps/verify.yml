@@ -1,0 +1,21 @@
+---
+
+- name: "Find API staging url from routes"
+  shell: oc get routes -n openshift-3scale | grep {{ threescale_api_name }} | grep apicast-staging | awk '{ print $2 }'
+  register: api_route
+  failed_when:
+  - api_route.rc == 0
+  - api_route.stdout == ''
+
+- name: Test new API route is working https://{{ api_route.stdout }}
+  uri:
+    url: https://{{ api_route.stdout }}
+    validate_certs: no
+    method: GET
+    return_content: yes
+  register: api_test
+  changed_when: 'api_test.status == 403'
+  failed_when: "'Authentication parameters missing' not in api_test.content"
+
+- debug:
+    msg: API route https://{{ api_route.stdout }} responded with {{ api_test.content }}

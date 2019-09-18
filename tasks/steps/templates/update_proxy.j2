@@ -1,0 +1,7 @@
+{% 
+  set payload = [ 
+    'access_token=' ~ threescale_admin_token|urlencode,
+    'api_backend=https://echo-api.3scale.net:443'
+  ]
+%}
+{{ payload|join("&") }}

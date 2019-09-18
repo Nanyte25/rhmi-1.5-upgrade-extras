@@ -1,0 +1,35 @@
+
+---
+
+- set_fact:
+    create_service_payload: '{{ lookup(''template'', ''create_service.j2'') }}'
+    proxy_update_payload: '{{ lookup(''template'', ''update_proxy.j2'') }}'
+
+- name: Create the service
+  uri:
+    url: "{{ threescale_admin_route }}/admin/api/services.json"
+    validate_certs: no
+    method: POST
+    body: '{{ create_service_payload }}'
+    status_code: "201"
+  register: create_service_resp
+  changed_when: 'create_service_resp.status == 201'
+
+- name: Extract the service id that was created
+  set_fact:
+    threescale_created_service_id: '{{ create_service_resp.json.service.id }}'
+
+
+- name: Update the proxy definition
+  uri:
+    url: "{{ threescale_admin_route }}/admin/api/services/{{ threescale_created_service_id }}/proxy.json"
+    validate_certs: no
+    method: PATCH
+    body: '{{ proxy_update_payload }}'
+  register: update_proxy_resp
+  changed_when: 'update_proxy_resp.status == 200'
+
+
+- name: Wait for a couple seconds for route to be created by Zync
+  pause:
+    seconds: 10

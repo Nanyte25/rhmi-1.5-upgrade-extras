@@ -1,0 +1,26 @@
+---
+
+- name: "Logging into Openshift Cluster: {{ openshift_console_url }}"
+  shell: oc login {{ openshift_console_url }} --token {{ openshift_token }}
+  register: login
+  failed_when:
+  - login.stderr != ''
+
+# In 2.6 the route name for admin changed to have an id at the end. Need to find it like this.
+- name: "Fetch 3scale Admin URL"
+  shell:  oc get routes -n openshift-3scale | grep system-provider | awk '{ print $2 }'
+  register: admin_route
+  failed_when:
+    - admin_route.rc == 0
+    - admin_route.stdout == ''
+
+- name: "Fetch 3scale Admin Access Token"
+  shell: oc get secret/system-seed -n openshift-3scale -o template --template=\{\{.data.ADMIN_ACCESS_TOKEN\}\} | base64 --decode
+  register: admin_auth_config
+  failed_when:
+    - admin_auth_config.rc == 0
+    - admin_auth_config.stdout == ''
+
+- set_fact:
+    threescale_admin_route: "https://{{ admin_route.stdout }}"
+    threescale_admin_token: "{{ admin_auth_config.stdout }}"
