@@ -1,10 +1,6 @@
 
 ---
 
-- set_fact:
-    create_service_payload: '{{ lookup(''template'', ''create_service.j2'') }}'
-    proxy_update_payload: '{{ lookup(''template'', ''update_proxy.j2'') }}'
-
 - name: Create the service
   uri:
     url: "{{ threescale_admin_route }}/admin/api/services.json"

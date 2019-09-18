@@ -1,4 +1,5 @@
 threescale_api_name: testapi1
 
-
+create_service_payload: '{{ lookup(''template'', ''create_service.j2'') }}'
+proxy_update_payload: '{{ lookup(''template'', ''update_proxy.j2'') }}'
 delete_service_payload: '{{ lookup(''template'', ''delete_service.j2'') }}'
