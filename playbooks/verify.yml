@@ -7,3 +7,5 @@
         name: openshift
   - include_role:
         name: 3scale_router_validation
+  - include_role:
+        name: fuse_dashboard_syndesis_integration

@@ -1,0 +1,22 @@
+---
+
+# The dashboard has been fixed on the master 1.7.x branch
+- name: Get fuse 1.7.x branch dashboard
+  get_url:
+    url: https://raw.githubusercontent.com/syndesisio/syndesis/1.7.x/install/addons/syndesis-integration-dashboard.yml
+    dest: /tmp/syndesis-integration-dashboard.yml
+
+- name: Delete the broken fuse dashboard
+  shell: oc delete grafanadashboard syndesis-integration -n openshift-fuse
+  register: fuse_monitoring_resource_delete
+  failed_when: fuse_monitoring_resource_delete.stderr != ''
+
+- name: Create fuse monitoring resources
+  shell: oc create -f /tmp/syndesis-integration-dashboard.yml -n openshift-fuse
+  register: fuse_monitoring_resource
+  failed_when: fuse_monitoring_resource.stderr != '' and 'already exists' not in fuse_monitoring_resource.stderr
+
+- name: Delete fuse dashboard tmp file
+  file: 
+    path: /tmp/syndesis-integration-dashboard.yml
+    state: absent
