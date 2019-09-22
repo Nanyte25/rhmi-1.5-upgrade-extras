@@ -1,0 +1,12 @@
+---
+- name: Run Prerequisite checks
+  import_tasks: 3scale_prerequisites.yml
+
+- name: Create API in 3scale
+  import_tasks: createAPI.yml
+
+- name: Validate API in 3scale
+  import_tasks: verifyAPI.yml
+
+- name: Delete API in 3scale
+  import_tasks: deleteAPI.yml

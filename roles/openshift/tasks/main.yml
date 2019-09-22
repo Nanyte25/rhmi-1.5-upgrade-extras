@@ -1,0 +1,7 @@
+---
+
+- name: "Logging into Openshift Cluster: {{ openshift_console_url }}"
+  shell: oc login {{ openshift_console_url }} --token {{ openshift_token }}
+  register: login
+  failed_when:
+  - login.stderr != ''

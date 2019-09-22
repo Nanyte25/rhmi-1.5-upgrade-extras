@@ -1,11 +1,5 @@
 ---
 
-- name: "Logging into Openshift Cluster: {{ openshift_console_url }}"
-  shell: oc login {{ openshift_console_url }} --token {{ openshift_token }}
-  register: login
-  failed_when:
-  - login.stderr != ''
-
 # In 2.6 the route name for admin changed to have an id at the end. Need to find it like this.
 - name: "Fetch 3scale Admin URL"
   shell:  oc get routes -n openshift-3scale | grep system-provider | awk '{ print $2 }'

@@ -3,8 +3,7 @@
 - hosts: localhost
   gather_facts: yes
   tasks:
-   - include_vars: ../defaults/main.yml
-   - import_tasks: ../tasks/steps/prerequisites.yml
-   - import_tasks: ../tasks/steps/createAPI.yml
-   - import_tasks: ../tasks/steps/verify.yml
-   - import_tasks: ../tasks/steps/deleteAPI.yml
+  - include_role:
+        name: openshift
+  - include_role:
+        name: 3scale_router_validation
