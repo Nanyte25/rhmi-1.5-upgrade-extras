@@ -1,0 +1,39 @@
+---
+
+- name: Pull the latest images for runtime imagestreams
+  shell: "oc import-image {{ item }} --all=true --confirm -n openshift"
+  register: image_import
+  until: image_import.stdout
+  retries: 50
+  delay: 1
+  failed_when: image_import.stderr != '' and not image_import.stdout
+  changed_when: False
+  with_items:
+    - dotnet
+    - dotnet-runtime
+    - eap-cd-openshift
+    - httpd
+    - java
+    - jboss-amq-63
+    - jboss-decisionserver64-openshift
+    - jboss-eap64-openshift
+    - jboss-eap70-openshift
+    - jboss-eap71-openshift
+    - jboss-eap72-openshift
+    - jboss-processserver64-openshift
+    - jboss-webserver30-tomcat7-openshift
+    - jboss-webserver30-tomcat8-openshift
+    - jboss-webserver31-tomcat7-openshift
+    - jboss-webserver31-tomcat8-openshift
+    - jenkins
+    - mariadb
+    - mongodb
+    - mysql
+    - nginx
+    - nodejs
+    - perl
+    - php
+    - python
+    - redhat-openjdk18-openshift
+    - redis
+    - ruby
