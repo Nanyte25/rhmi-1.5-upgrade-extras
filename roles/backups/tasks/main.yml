@@ -1,0 +1,59 @@
+---
+
+- name: get the current time for a timestamp
+  command: date +"%Y-%m-%d-%H%M%S"
+  register: timestamp
+
+
+- name: Trigger each backup job
+  shell: "oc -n openshift-integreatly-backups create job --from=cronjob/{{ item }}-backup {{ item }}-backup-manual-{{ timestamp.stdout }}"
+  register: backup
+  until: backup.stdout
+  retries: 50
+  delay: 1
+  failed_when: backup.stderr != '' and not backup.stdout
+  changed_when: False
+  with_items:
+    - launcher-postgres
+    - fuse-postgres
+    - enmasse-postgres
+    - codeready-postgres
+    - codeready-pv
+    - 3scale-mysql
+    - 3scale-postgres
+    - 3scale-redis
+    - resources
+    
+- name: Verify each backup completes
+  shell: "oc -n openshift-integreatly-backups get job {{ item }}-backup-manual-{{ timestamp.stdout }} -o=jsonpath='{.status.conditions[*].type}' | grep -i -E 'failed|complete'"
+  register: backup_job
+  until: "'Complete' in backup_job.stdout or 'Failed' in backup_job.stdout"
+  retries: 100
+  delay: 10
+  failed_when: "'Failed' in backup_job.stdout"
+  changed_when: False
+  with_items:
+    - launcher-postgres
+    - fuse-postgres
+    - enmasse-postgres
+    - codeready-postgres
+    - codeready-pv
+    - 3scale-mysql
+    - 3scale-postgres
+    - 3scale-redis
+    - resources
+
+- name: Trigger SSO backup job
+  shell: "oc -n openshift-sso create job --from=cronjob/daily-at-midnight daily-at-midnight-manual-{{ timestamp.stdout }}"
+  register: sso_backup
+  failed_when: sso_backup.stderr != '' and not sso_backup.stdout
+  changed_when: False
+
+- name: Verify SSO backup completes
+  shell: "oc -n openshift-sso get job daily-at-midnight-manual-{{ timestamp.stdout }} -o=jsonpath='{.status.conditions[*].type}' | grep -i -E 'failed|complete'"
+  register: sso_backup_job
+  until: "'Complete' in sso_backup_job.stdout or 'Failed' in sso_backup_job.stdout"
+  retries: 100
+  delay: 10
+  failed_when: "'Failed' in sso_backup_job.stdout"
+  changed_when: False

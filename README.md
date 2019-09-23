@@ -17,5 +17,10 @@ pip install -U Jinja2
 
 ### Example usage
 ```
-ansible-playbook -i test/inventories playbooks/verify.yml -e openshift_console_url=https://console.cake.openshift.com -e openshift_token=ireallylikecake
+# Run backups
+ansible-playbook -i test/inventories playbooks/backups.yml -e openshift_console_url=https://console.cake.openshift.com -e openshift_token=ireallylikecake
+
+# Post install
+ansible-playbook -i test/inventories playbooks/post_install.yml -e openshift_console_url=https://console.cake.openshift.com -e openshift_token=ireallylikecake
+
 ```

@@ -1,0 +1,9 @@
+---
+
+- hosts: localhost
+  gather_facts: yes
+  tasks:
+  - include_role:
+        name: openshift
+  - include_role:
+        name: backups
